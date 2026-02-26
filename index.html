@@ -14,12 +14,14 @@
         .table-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .table-card h3 { margin-top: 0; text-align: center; color: #3f51b5; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
+        /* ตั้งค่าให้ตาราง Scroll ได้ และเห็นประมาณ 10 แถว */
         .table-wrapper { max-height: 450px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
         th, td { padding: 10px 8px; text-align: right; border-bottom: 1px solid #eee; }
         th:nth-child(1), td:nth-child(1) { text-align: center; width: 40px; }
         th:nth-child(2), td:nth-child(2) { text-align: left; }
         
+        /* ล็อกหัวตารางให้อยู่กับที่ตอนเลื่อน */
         th { position: sticky; top: 0; background-color: #e8eaf6; color: #1a237e; z-index: 1; font-weight: bold; }
         tbody tr:hover { background-color: #f5f5f5; }
 
@@ -31,11 +33,6 @@
 
         .chart-section { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto 40px auto; }
         .chart-section.active { display: block; }
-
-        /* สไตล์สำหรับลิงก์ท้ายหน้า */
-        .footer-link { text-align: center; margin-top: 40px; margin-bottom: 20px; font-size: 1em; color: #666; }
-        .footer-link a { color: #1a237e; text-decoration: none; font-weight: bold; background-color: white; padding: 8px 15px; border-radius: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.3s; }
-        .footer-link a:hover { background-color: #1a237e; color: white; }
     </style>
 </head>
 <body>
@@ -67,7 +64,6 @@
                 <button class="btn-graph" onclick="showGraph('ipd', 'กราฟ 10 อันดับโรค - ผู้ป่วยใน (IPD)')">📊 ดูกราฟ Top 10 (IPD)</button>
             </div>
         </div>
-
         <div class="footer-link">
             Raw data &gt;&gt; 
             <a href="https://docs.google.com/spreadsheets/d/1racw2pgO4onmvXtUSkkLyjf4wD0MnXOlg25WSFDPZIo/edit?gid=1546273871#gid=1546273871" target="_blank">
@@ -96,6 +92,7 @@
                     const anValue = row["an"] ? row["an"].trim() : "";
                     const type = anValue === "" ? "opd" : "ipd";
                     
+                    // ดึงปีงบประมาณและแปลงให้อยู่ในรูปแบบตัวเลขสั้น (66, 67, 68, 69)
                     let yearRaw = row["BDG_YEAR"] ? row["BDG_YEAR"].toString().trim() : "";
                     let year = "other";
                     if (yearRaw.includes("66") || yearRaw === "2566") year = "66";
@@ -103,6 +100,7 @@
                     else if (yearRaw.includes("68") || yearRaw === "2568") year = "68";
                     else if (yearRaw.includes("69") || yearRaw === "2569") year = "69";
 
+                    // ฟังก์ชันผู้ช่วยบวกตัวเลข
                     const addStat = (group) => {
                         if (!stats[group][diag]) stats[group][diag] = { "66": 0, "67": 0, "68": 0, "69": 0, total: 0 };
                         if (year !== "other") stats[group][diag][year]++;
@@ -113,6 +111,7 @@
                     addStat(type);
                 });
 
+                // แปลง Object เป็น Array และเรียงลำดับจากมากไปน้อย
                 const formatData = (obj) => Object.keys(obj)
                     .map(key => ({ name: key, ...obj[key] }))
                     .sort((a, b) => b.total - a.total);
@@ -121,6 +120,7 @@
                 globalData.opd = formatData(stats.opd);
                 globalData.ipd = formatData(stats.ipd);
 
+                // สร้างตารางลงใน HTML
                 renderTable('tableTotal', globalData.total);
                 renderTable('tableOPD', globalData.opd);
                 renderTable('tableIPD', globalData.ipd);
@@ -160,16 +160,17 @@
         }
 
         function showGraph(type, titleText) {
-            const dataArray = globalData[type].slice(0, 10);
+            const dataArray = globalData[type].slice(0, 10); // เอาแค่ 10 อันดับแรก
             const labels = dataArray.map(item => item.name);
             const dataValues = dataArray.map(item => item.total);
 
             document.getElementById('chartContainer').classList.add('active');
             document.getElementById('chartTitle').innerText = titleText;
             
+            // เลื่อนหน้าจอขึ้นไปดูกราฟ
             document.getElementById('chartContainer').scrollIntoView({ behavior: 'smooth' });
 
-            if (currentChart) { currentChart.destroy(); }
+            if (currentChart) { currentChart.destroy(); } // ลบกราฟเก่าออกก่อนวาดใหม่
 
             const ctx = document.getElementById('myChart').getContext('2d');
             currentChart = new Chart(ctx, {
@@ -186,7 +187,7 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y',
+                    indexAxis: 'y', // กราฟแนวนอน
                     responsive: true,
                     plugins: { legend: { display: false } }
                 }
