@@ -53,6 +53,14 @@
         @media (max-width: 800px) {
             .charts-grid { grid-template-columns: 1fr; } /* บนมือถือจะเรียง 1 คอลัมน์ลงมา */
         }
+        /* 1. เปลี่ยนพื้นหลัง body เป็นสีดำสนิท */
+body { font-family: 'Sarabun', sans-serif; padding: 15px; background-color: #000000; margin: 0; color: #333; }
+
+/* 2. ปรับสีหัวข้อให้สว่างขึ้น (แดงสว่าง) จะได้ตัดกับสีดำ */
+.header-title { text-align: center; color: #ff5252; margin-bottom: 20px; font-size: 1.8em; font-weight: bold; }
+
+/* 3. ปรับตัวหนังสือ Footer ด้านล่างให้เป็นสีเทาอ่อน จะได้มองเห็น */
+.footer-link { text-align: center; margin-top: 20px; margin-bottom: 40px; font-size: 0.9em; color: #cccccc; }
     </style>
 </head>
 <body>
